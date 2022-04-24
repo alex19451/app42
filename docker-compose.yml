@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  mvnbuild:
+    build: ./mvnbuild
+    volumes:
+      - project_data:/tmp/project/target
+    depends_on:
+      - mysql
+
+  tomcatweb:
+    build: ./tomcatweb
+    restart: always
+    depends_on:
+      - mvnbuild
+    ports:
+      - '8088:8080'
+    volumes:
+      - project_data:/usr/local/tomcat/webapps/
+
+  mysql:
+    image: mysql:5.6
+    container_name: mysql
+    restart: always
+    environment:
+       MYSQL_ROOT_PASSWORD: password
+       MYSQL_DATABASE: app42_db
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
+  project_data:
